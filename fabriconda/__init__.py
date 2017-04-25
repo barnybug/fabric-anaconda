@@ -20,9 +20,9 @@ def create_env(environment_yml, name, home='~'):
     env = '%s/anaconda/envs/%s' % (home, name)
     with cd(anaconda_bin):
         if exists(env):
-            run('./conda env update -f %s' % environment_yml)
+            run('./conda env update -f %s -n %s' % (environment_yml, name))
         else:
-            run('./conda env create -f %s' % environment_yml)
+            run('./conda env create -f %s -n %s' % (environment_yml, name))
 
 def env(name, home='~'):
     """Run with an anaconda environment"""

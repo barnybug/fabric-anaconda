@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="fabric-anaconda",
-    version="0.0.4",
+    version="0.0.7",
     author='Barnaby Gray',
     author_email='barnaby@pickle.me.uk',
     url='http://pypi.python.org/pypi/fabric-anaconda/',
