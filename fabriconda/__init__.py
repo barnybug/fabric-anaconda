@@ -1,29 +1,33 @@
-from fabric.api import cd, run
-from fabric.contrib.files import exists
-from fabric.context_managers import prefix
-
 # defaults
 CONDA_REPO = 'https://repo.continuum.io/miniconda/'
 
-def install(conda_repo=CONDA_REPO, base='Miniconda2', version='latest', platform='Linux', home='~'):
-    arch = 'x86' if run('uname -i') == 'i686' else 'x86_64'
+def uname_platform(ctx):
+    res = ctx.run('uname -i', hide=True)
+    return res.stdout.strip()
+
+def exists(ctx, path):
+    cmd = f'test -e "$(echo {path})"'
+    return ctx.run(cmd, hide=True, warn=True).ok
+
+def install(ctx, conda_repo=CONDA_REPO, base='Miniconda3', version='latest', platform='Linux', home='~'):
+    arch = 'x86' if uname_platform(ctx) == 'i686' else 'x86_64'
     conda_vers = '%s-%s-%s-%s.sh' % (base, version, platform, arch)
     anaconda = home+'/anaconda'
-    if not exists(anaconda):
-        run('mkdir -p %s/downloads' % home)
-        with cd(home+'/downloads'):
-            run('wget -nv -N %s%s' % (conda_repo, conda_vers))
-            run('bash %s -b -p %s' % (conda_vers, anaconda))
+    if not exists(ctx, anaconda):
+        ctx.run('mkdir -p %s/downloads' % home)
+        with ctx.cd(home+'/downloads'):
+            ctx.run('wget -nv -N %s%s' % (conda_repo, conda_vers))
+            ctx.run('bash %s -b -p %s' % (conda_vers, anaconda))
 
-def create_env(environment_yml, name, home='~'):
+def create_env(ctx, environment_yml, name, home='~'):
     anaconda_bin = '%s/anaconda/bin' % home
     env = '%s/anaconda/envs/%s' % (home, name)
-    with cd(anaconda_bin):
+    with ctx.cd(anaconda_bin):
         if exists(env):
-            run('./conda env update -f %s -n %s' % (environment_yml, name))
+            ctx.run('./conda env update -f %s -n %s' % (environment_yml, name))
         else:
-            run('./conda env create -f %s -n %s' % (environment_yml, name))
+            ctx.run('./conda env create -f %s -n %s' % (environment_yml, name))
 
-def env(name, home='~'):
+def env(ctx, name, home='~'):
     """Run with an anaconda environment"""
-    return prefix('source %s/anaconda/bin/activate %s' % (home, name))
+    return ctx.prefix('source %s/anaconda/bin/activate %s' % (home, name))
