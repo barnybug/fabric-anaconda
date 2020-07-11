@@ -24,7 +24,7 @@ def create_env(ctx, environment_yml, name, home='~'):
     anaconda_bin = '%s/%s/bin' % (home, ANACONDA)
     env = '%s/%s/envs/%s' % (home, ANACONDA, name)
     with ctx.cd(anaconda_bin):
-        if exists(env):
+        if exists(ctx, env):
             ctx.run('./conda env update -f %s -n %s' % (environment_yml, name))
         else:
             ctx.run('./conda env create -f %s -n %s' % (environment_yml, name))
@@ -33,7 +33,7 @@ def delete_env(ctx, name, home='~'):
     anaconda_bin = '%s/%s/bin' % (home, ANACONDA)
     env = '%s/%s/envs/%s' % (home, ANACONDA, name)
     with ctx.cd(anaconda_bin):
-        if exists(env):
+        if exists(ctx, env):
             ctx.run('./conda env remove -n %s --yes' % name)
 
 def env(ctx, name, home='~'):
