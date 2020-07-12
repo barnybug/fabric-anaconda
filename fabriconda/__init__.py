@@ -22,19 +22,14 @@ def install(ctx, conda_repo=CONDA_REPO, base='Miniconda3', version='latest', pla
 
 def create_env(ctx, environment_yml, name, home='~'):
     anaconda_bin = '%s/%s/bin' % (home, ANACONDA)
-    env = '%s/%s/envs/%s' % (home, ANACONDA, name)
-    with ctx.cd(anaconda_bin):
-        if exists(ctx, env):
-            ctx.run('./conda env update -f %s -n %s' % (environment_yml, name))
-        else:
-            ctx.run('./conda env create -f %s -n %s' % (environment_yml, name))
+    return ctx.run('%s/conda env create -f %s -n %s' % (anaconda_bin, environment_yml, name), hide=True, warn=True).ok
 
 def delete_env(ctx, name, home='~'):
     anaconda_bin = '%s/%s/bin' % (home, ANACONDA)
     env = '%s/%s/envs/%s' % (home, ANACONDA, name)
     with ctx.cd(anaconda_bin):
         if exists(ctx, env):
-            ctx.run('./conda env remove -n %s --yes' % name)
+            return ctx.run('./conda env remove -n %s --yes' % name, hide=True, warn=True).ok
 
 def env(ctx, name, home='~'):
     """Run with an anaconda environment"""
